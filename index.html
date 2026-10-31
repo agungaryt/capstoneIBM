@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Quality & Cleansing Management Hub</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      <span>DataHub</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#section-dashboard" class="nav-item active" data-nav="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="#section-data-explorer" class="nav-item" data-nav="data-explorer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Data Explorer
+      </a>
+      <a href="#section-analytics" class="nav-item" data-nav="analytics">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Analytics
+      </a>
+      <a href="#" class="nav-item" data-nav="rules-engine" data-modal="modalRulesEngine">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Rules Engine
+      </a>
+      <a href="#" class="nav-item" data-nav="settings" data-modal="modalSettings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Settings
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-avatar">SA</div>
+      <div class="user-info">
+        <span class="user-name">System Admin</span>
+        <span class="user-role">Data Engineer</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Data Quality &amp; Cleansing Hub</h1>
+        <p class="page-subtitle">Monitor, validate, and cleanse your customer dataset in real-time</p>
+      </div>
+      <div class="header-actions">
+        <button id="btnExportCSV" class="btn btn-outline">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+        <button id="btnExportJSON" class="btn btn-outline">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export JSON
+        </button>
+        <div class="last-updated">
+          <span class="pulse-dot"></span>
+          <span id="lastUpdated">Last sync: just now</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== KPI CARDS ===== -->
+    <section id="section-dashboard" class="kpi-grid" aria-label="Key Performance Indicators">
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-icon--blue">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-label">Total Records</span>
+          <span class="kpi-value" id="kpiTotal">0</span>
+          <span class="kpi-delta kpi-delta--neutral">Customer dataset loaded</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-icon--green">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-label">Health Score</span>
+          <span class="kpi-value" id="kpiHealth">0%</span>
+          <div class="progress-bar-wrap"><div class="progress-bar" id="healthBar"></div></div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-icon--orange">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-label">Missing Values</span>
+          <span class="kpi-value" id="kpiMissing">0</span>
+          <span class="kpi-delta kpi-delta--red" id="kpiMissingPct">— across all columns</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-icon--red">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+        <div class="kpi-body">
+          <span class="kpi-label">Duplicate Rows</span>
+          <span class="kpi-value" id="kpiDuplicates">0</span>
+          <span class="kpi-delta kpi-delta--red" id="kpiDupPct">— of total records</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ACTION BAR ===== -->
+    <section class="action-bar">
+      <button id="btnCleanDuplicates" class="btn btn-danger">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        Clean Duplicates
+      </button>
+      <button id="btnFixMissing" class="btn btn-warning">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Fix Missing Values
+      </button>
+      <button id="btnResetData" class="btn btn-ghost">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
+        Reset to Original
+      </button>
+      <div class="action-bar-spacer"></div>
+      <div id="toastContainer" class="toast-container"></div>
+    </section>
+
+    <!-- ===== CHARTS ===== -->
+    <section id="section-analytics" class="charts-grid" aria-label="Data Quality Charts">
+      <div class="chart-card chart-card--sm">
+        <div class="chart-card-header">
+          <h2 class="chart-title">Quality Breakdown</h2>
+          <span class="chart-badge">Doughnut</span>
+        </div>
+        <div class="chart-wrap-doughnut">
+          <canvas id="doughnutChart"></canvas>
+          <div class="doughnut-center" id="doughnutCenter"></div>
+        </div>
+      </div>
+
+      <div class="chart-card chart-card--md">
+        <div class="chart-card-header">
+          <h2 class="chart-title">Error Types per Column</h2>
+          <span class="chart-badge">Bar</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card chart-card--lg">
+        <div class="chart-card-header">
+          <h2 class="chart-title">Data Ingestion &amp; Cleaning Trend</h2>
+          <span class="chart-badge">Line</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DATA TABLE ===== -->
+    <section id="section-data-explorer" class="table-section" aria-label="Customer Data Table">
+      <div class="table-header">
+        <h2 class="table-title">Customer Records</h2>
+        <div class="table-controls">
+          <div class="search-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchInput" placeholder="Search name, email, city…" class="search-input" />
+          </div>
+          <div class="filter-tabs" role="tablist">
+            <button class="filter-tab active" data-filter="all">All</button>
+            <button class="filter-tab" data-filter="valid">Valid</button>
+            <button class="filter-tab" data-filter="error">Errors</button>
+            <button class="filter-tab" data-filter="duplicate">Duplicates</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table" id="dataTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>City</th>
+              <th>Age</th>
+              <th>Signup Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <span id="tableInfo" class="table-info">Showing 0 records</span>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== MODAL: RULES ENGINE ===== -->
+  <div id="modalRulesEngine" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="rulesTitle" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <h2 class="modal-title" id="rulesTitle">Rules Engine</h2>
+        </div>
+        <button class="modal-close" data-close-modal="modalRulesEngine" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Active validation rules applied to every record in the dataset during ingestion and cleansing.</p>
+        <div class="rules-list">
+          <div class="rule-item rule-item--active">
+            <div class="rule-icon rule-icon--green">✓</div>
+            <div class="rule-content">
+              <span class="rule-name">Email Format Validation</span>
+              <span class="rule-desc">Validates that every email field matches the pattern <code>user@domain.tld</code>. Records with <code>null</code> or malformed emails (missing <code>@</code>, no TLD) are flagged as <strong>Error</strong>.</span>
+              <span class="rule-tag">Field: email</span>
+            </div>
+            <span class="rule-status rule-status--on">Active</span>
+          </div>
+          <div class="rule-item rule-item--active">
+            <div class="rule-icon rule-icon--green">✓</div>
+            <div class="rule-content">
+              <span class="rule-name">Duplicate Row Detection</span>
+              <span class="rule-desc">Identifies rows where the combination of <code>name</code> + <code>email</code> + <code>phone</code> is identical to a previously seen record (by lower ID). Duplicates are flagged and can be removed via <em>Clean Duplicates</em>.</span>
+              <span class="rule-tag">Fields: name, email, phone</span>
+            </div>
+            <span class="rule-status rule-status--on">Active</span>
+          </div>
+          <div class="rule-item rule-item--active">
+            <div class="rule-icon rule-icon--green">✓</div>
+            <div class="rule-content">
+              <span class="rule-name">Null / Missing Value Detection</span>
+              <span class="rule-desc">Checks all five required fields: <code>name</code>, <code>email</code>, <code>phone</code>, <code>city</code>, <code>age</code>. Any <code>null</code> value increments the <em>Missing Values</em> KPI counter and marks the row as an Error.</span>
+              <span class="rule-tag">Fields: name, email, phone, city, age</span>
+            </div>
+            <span class="rule-status rule-status--on">Active</span>
+          </div>
+          <div class="rule-item rule-item--active">
+            <div class="rule-icon rule-icon--blue">↺</div>
+            <div class="rule-content">
+              <span class="rule-name">Auto-Fill Missing Values</span>
+              <span class="rule-desc">When triggered, replaces <code>null</code> fields with safe defaults: name → <em>Unknown Name</em>, email → <em>userID@datahub.internal</em>, phone → <em>+62-000-0000-000</em>, city → <em>Unknown City</em>, age → <em>0</em>.</span>
+              <span class="rule-tag">Trigger: Fix Missing Values button</span>
+            </div>
+            <span class="rule-status rule-status--on">Active</span>
+          </div>
+          <div class="rule-item">
+            <div class="rule-icon rule-icon--gray">○</div>
+            <div class="rule-content">
+              <span class="rule-name">Age Range Validation</span>
+              <span class="rule-desc">Planned rule: flag records where <code>age</code> is outside the range 16–100 as suspicious. Currently pending configuration.</span>
+              <span class="rule-tag">Field: age</span>
+            </div>
+            <span class="rule-status rule-status--off">Pending</span>
+          </div>
+          <div class="rule-item">
+            <div class="rule-icon rule-icon--gray">○</div>
+            <div class="rule-content">
+              <span class="rule-name">Phone Number Format Check</span>
+              <span class="rule-desc">Planned rule: validate Indonesian phone numbers against the pattern <code>08XXXXXXXXXX</code> (10–13 digits). Currently pending configuration.</span>
+              <span class="rule-tag">Field: phone</span>
+            </div>
+            <span class="rule-status rule-status--off">Pending</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close-modal="modalRulesEngine">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: SETTINGS ===== -->
+  <div id="modalSettings" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          <h2 class="modal-title" id="settingsTitle">Settings</h2>
+        </div>
+        <button class="modal-close" data-close-modal="modalSettings" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Configure dashboard preferences and data management behaviour.</p>
+        <div class="settings-group">
+          <h3 class="settings-group-title">Display</h3>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-name">Rows Per Page</span>
+              <span class="setting-sub">Number of records displayed per table page</span>
+            </div>
+            <select id="settingPageSize" class="setting-select">
+              <option value="10">10</option>
+              <option value="15" selected>15</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-name">Highlight Error Rows</span>
+              <span class="setting-sub">Apply red/amber background tint to rows with issues</span>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="settingHighlight" checked />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-group">
+          <h3 class="settings-group-title">Data Management</h3>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-name">Auto-sync Timestamp</span>
+              <span class="setting-sub">Update "Last sync" clock on every action</span>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="settingTimestamp" checked />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-name">Toast Duration (ms)</span>
+              <span class="setting-sub">How long notifications stay visible</span>
+            </div>
+            <select id="settingToastDuration" class="setting-select">
+              <option value="2000">2 000 ms</option>
+              <option value="3000" selected>3 000 ms</option>
+              <option value="5000">5 000 ms</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close-modal="modalSettings">Cancel</button>
+        <button class="btn btn-primary" id="btnSaveSettings">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
